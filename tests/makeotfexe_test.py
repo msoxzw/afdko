@@ -582,6 +582,9 @@ def test_spec(path):
             return
         raise
 
+    if name.endswith(".xfail"):
+        raise
+
     tables = TEST_FEATURE_FILES_TABLES.get(name, TEST_TABLES)
     actual_ttx = generate_ttx_dump(actual_path, tables)
     expected_ttx = get_expected_path(ttx_filename)
