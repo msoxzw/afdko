@@ -1,3 +1,5 @@
+import glob
+import os
 import pytest
 import subprocess
 
@@ -561,3 +563,32 @@ def test_feature_file(name):
         if name in TEST_FEATURE_FILES_XFAIL:
             pytest.xfail()
         raise
+
+
+@pytest.mark.parametrize('path', glob.glob(get_input_path("spec/*.fea")))
+def test_spec(path):
+    try:
+        name = os.path.splitext(os.path.basename(path))[0]
+        input_filename = "spec/font.pfa"
+        feat_filename = f"spec/{name}.fea"
+        ttx_filename = f"spec/{name}.ttx"
+        actual_path = get_temp_file_path()
+
+        runner(CMD + ['-o', 'f', f'_{get_input_path(input_filename)}',
+                            'ff', f'_{get_input_path(feat_filename)}',
+                            'o', f'_{actual_path}'])
+    except Exception:
+        if name.endswith(".xfail"):
+            pytest.xfail()
+        raise
+
+    tables = TEST_FEATURE_FILES_TABLES.get(name, TEST_TABLES)
+    actual_ttx = generate_ttx_dump(actual_path, tables)
+    expected_ttx = get_expected_path(ttx_filename)
+    assert differ([expected_ttx, actual_ttx, '-l', '2',
+                   '-s',
+                   '    <checkSumAdjustment value=' + SPLIT_MARKER +
+                   '    <checkSumAdjustment value=' + SPLIT_MARKER +
+                   '    <created value=' + SPLIT_MARKER +
+                   '    <modified value=',
+                   '-r', r'^\s+Version.*;hotconv.*;makeotfexe'])
