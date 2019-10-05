@@ -1,0 +1,5 @@
+# Test useExtension in aalt feature.
+
+feature aalt useExtension {
+  sub A by B;
+} aalt;

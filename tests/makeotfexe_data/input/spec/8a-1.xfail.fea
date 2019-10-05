@@ -1,0 +1,5 @@
+# Test useExtension in feature other than aalt.
+
+feature liga useExtension {
+  sub A by B;
+} liga;
