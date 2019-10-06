@@ -585,7 +585,11 @@ def test_spec(path):
     if name.endswith(".xfail"):
         raise
 
-    tables = TEST_FEATURE_FILES_TABLES.get(name, TEST_TABLES)
+    tables = TEST_TABLES
+    with open(get_input_path(feat_filename)) as fp:
+        line = fp.readline()
+        if line.startswith("#") and "TABLES" in line:
+            tables = line.split("# TABLES:")[1].strip().split(",")
     actual_ttx = generate_ttx_dump(actual_path, tables)
     expected_ttx = get_expected_path(ttx_filename)
     assert differ([expected_ttx, actual_ttx, '-l', '2',
