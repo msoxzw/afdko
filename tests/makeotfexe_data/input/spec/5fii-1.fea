@@ -1,0 +1,11 @@
+# Test deprecated except statement. Both features should be identical.
+@LET = [B];
+
+feature liga {
+ except A @LET sub A by A.alt1;
+} liga;
+
+feature rlig {
+ ignore sub A @LET;
+ sub A' by A.alt1;
+} rlig;
