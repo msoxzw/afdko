@@ -567,22 +567,24 @@ def test_feature_file(name):
 
 @pytest.mark.parametrize('path', glob.glob(get_input_path("spec/*.fea")))
 def test_spec(path):
-    try:
-        name = os.path.splitext(os.path.basename(path))[0]
-        input_filename = "spec/font.pfa"
-        feat_filename = f"spec/{name}.fea"
-        ttx_filename = f"spec/{name}.ttx"
-        actual_path = get_temp_file_path()
+    name = os.path.splitext(os.path.basename(path))[0]
+    input_filename = "spec/font.pfa"
+    feat_filename = f"spec/{name}.fea"
+    ttx_filename = f"spec/{name}.ttx"
+    actual_path = get_temp_file_path()
+    bad = name.endswith(".bad")
+    passed = True
 
+    try:
         runner(CMD + ['-o', 'f', f'_{get_input_path(input_filename)}',
                             'ff', f'_{get_input_path(feat_filename)}',
                             'o', f'_{actual_path}'])
     except Exception:
-        if name.endswith(".xfail"):
+        if bad:
             return
         raise
 
-    if name.endswith(".xfail"):
+    if bad:
         raise
 
     tables = TEST_TABLES
