@@ -572,26 +572,23 @@ def test_spec(path):
     feat_filename = f"spec/{name}.fea"
     ttx_filename = f"spec/{name}.ttx"
     actual_path = get_temp_file_path()
-    bad = name.endswith(".bad")
-    passed = True
 
-    try:
-        runner(CMD + ['-o', 'f', f'_{get_input_path(input_filename)}',
-                            'ff', f'_{get_input_path(feat_filename)}',
-                            'o', f'_{actual_path}'])
-    except Exception:
-        if bad:
-            return
-        raise
+    cmd = CMD + ['-o', 'f', f'_{get_input_path(input_filename)}',
+                       'ff', f'_{get_input_path(feat_filename)}',
+                       'o', f'_{actual_path}']
 
-    if bad:
-        raise
+    if name.endswith(".bad"):
+        with pytest.raises(subprocess.CalledProcessError):
+            runner(cmd)
+        return
+    runner(cmd)
 
     tables = TEST_TABLES
     with open(get_input_path(feat_filename)) as fp:
         line = fp.readline()
         if line.startswith("#") and "TABLES" in line:
             tables = line.split("# TABLES:")[1].strip().split(",")
+
     actual_ttx = generate_ttx_dump(actual_path, tables)
     expected_ttx = get_expected_path(ttx_filename)
     assert differ([expected_ttx, actual_ttx, '-l', '2',
