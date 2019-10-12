@@ -1,0 +1,5 @@
+# Test class replacement in contextual sub.
+
+lookup test {
+  sub f' i' by [f_i];
+} test;
